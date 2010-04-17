@@ -1,18 +1,7 @@
-This document assumes you are running default Ubuntu 9.10 and MythTV .22 fixes like me.
+This document assumes you are running default Ubuntu 9.10 and MythTV .23 fixes.
+This version was created from my original code by wagnerrp from the MythTV wiki.
+
 Your mileage may vary with other distros or MythTV version.
-
-****************************************************************
-
-This takes place on your backend MySQL server:
-
-*** SQL SCRIPT:
-
-I used phpmyadmin, but you can probably google how to run the mysql command line client, 
-connect to your mythconverg database, and execute z_removeablevideos.sql.
-
-The syntax should be (from your mysql backend) something like:
-
-mysql mythconverg -u mythtv -p z_removablevideos.sql
 
 ****************************************************************
 
@@ -26,10 +15,6 @@ sudo apt-get install python python-mysqldb
 
 sudo cp mythadder.py /usr/bin
 sudo chmod +x /usr/bin/mythadder.py
-
-* modify /usr/bin/mythadder.py configuration section to match your settings:
-
-sudo nano /usr/bin/mythadder.py
 
 *** UDEV RULE:
 
