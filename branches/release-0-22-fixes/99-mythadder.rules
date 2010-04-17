@@ -1,0 +1,1 @@
+SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", RUN+="/usr/bin/python /usr/bin/mythadder.py"
