@@ -8,11 +8,11 @@ This takes place on your backend MySQL server:
 *** SQL SCRIPT:
 
 I used phpmyadmin, but you can probably google how to run the mysql command line client, 
-connect to your mythconverg database, and execute z_removeablevideos.sql.
+connect to your mythconverg database, and execute removeablemedia.sql.
 
 The syntax should be (from your mysql backend) something like:
 
-mysql mythconverg -u mythtv -p z_removablevideos.sql
+mysql mythconverg -u mythtv -p removablemedia.sql
 
 ****************************************************************
 

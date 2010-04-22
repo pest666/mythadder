@@ -41,6 +41,7 @@ import commands
 import re
 import time
 import MySQLdb
+import statvfs
 
 def doLog(logFile, output):
 	if logFile:
@@ -82,6 +83,23 @@ if device:
 				mount_point = line.split(' type ')[0].split(' on ')[1]
 				doLog(logFile, 'mounted at ' + mount_point + '\n')
 
+		f = os.statvfs(mount_point)
+		free_gb = f[statvfs.F_BAVAIL] * f[statvfs.F_FRSIZE] / float(1073741824)
+
+		# record partition uuid and free space
+		sql = """
+			INSERT INTO 
+				removablemedia 
+			SET partitionuuid = %s 
+				,freegb = %s 
+			ON DUPLICATE KEY UPDATE 
+				freegb = %s;"""
+		#doLog(logFile, sql  %  (uuid, free_gb, free_gb) + '\n')
+		try:
+			cursor.execute(sql, (uuid, free_gb, free_gb))
+		except MySQLdb.Error, e:
+			doLog(logFile,  "Error %d: %s" % (e.args[0], e.args[1]))
+
 		for directory in os.walk(mount_point):
 			for file in directory[2]:
 				for ext in extensions:
@@ -97,7 +115,7 @@ if device:
 						# insert each file that matches our extensions or update if it's already in the table
 						sql = """
 							INSERT INTO 
-								z_removablevideos 
+								removablemediavideos 
 							SET partitionuuid = %s 
 								,partitionlabel = %s 
 								,fileinode = %s 
@@ -131,7 +149,7 @@ if device:
 		# tuples for this query because of the inode list so we're letting python do the substitution here
 		sql = """
 			DELETE FROM 
-				z_removablevideos 
+				removablemediavideos 
 			WHERE
 				partitionuuid = '%s' AND
 				fileinode NOT IN (%s) ;""" % (uuid,  inodeList)
@@ -198,7 +216,7 @@ if device:
 				,fanart
 				,insertdate
 			FROM
-				z_removablevideos
+				removablemediavideos
 			WHERE
 				partitionuuid = %s AND
 				intid != 0 ;""" 
@@ -238,7 +256,7 @@ if device:
 				,insertdate
 				,fileinode
 			FROM 
-				z_removablevideos 
+				removablemediavideos 
 			WHERE
 				partitionuuid = %s AND
 				intid = 0 ;""" 
@@ -293,7 +311,7 @@ if device:
 			
 			# update our table with the intid from mythtv so we can remove the rows when the drive is disconnected
 			sql2 = """
-				UPDATE z_removablevideos
+				UPDATE removablemediavideos
 				SET intid = %s
 				WHERE partitionuuid = %s AND fileinode = %s
 			"""
@@ -317,7 +335,7 @@ if device:
 		# update everything in our table to catch metadata changes done inside mythtv
 		sql = """
 			UPDATE 
-				z_removablevideos rv,  videometadata vm
+				removablemediavideos rv,  videometadata vm
 			SET
 				rv.title = vm.title
 				,rv.subtitle = vm.subtitle
@@ -356,7 +374,7 @@ if device:
 			DELETE  
 				vm
 			FROM
-				videometadata vm, z_removablevideos rv
+				videometadata vm, removablemediavideos rv
 			WHERE 
 				rv.intid = vm.intid AND
 				rv.partitionuuid = %s;"""
@@ -367,5 +385,4 @@ if device:
 
 
 doLog(logFile, output)
-
 
