@@ -5,8 +5,9 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 
 CREATE TABLE removablemedia (
-  partitionuuid varchar(100) NOT NULL,
+  partitionuuid varchar(100) character set utf8 NOT NULL,
   freegb float NOT NULL,
+  totalgb float NOT NULL,
   PRIMARY KEY  (partitionuuid)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
