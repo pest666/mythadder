@@ -85,18 +85,22 @@ if device:
 
 		f = os.statvfs(mount_point)
 		free_gb = f[statvfs.F_BAVAIL] * f[statvfs.F_FRSIZE] / float(1073741824)
+		total_gb = f[statvfs.F_BLOCKS] * f[statvfs.F_FRSIZE] / float(1073741824)
+		doLog(logFile, '%.2fGB free of %.2fGB total\n' % (free_gb, total_gb))
 
 		# record partition uuid and free space
 		sql = """
 			INSERT INTO 
 				removablemedia 
 			SET partitionuuid = %s 
-				,freegb = %s 
+				,freegb = %s
+				,totalgb = %s 
 			ON DUPLICATE KEY UPDATE 
-				freegb = %s;"""
-		#doLog(logFile, sql  %  (uuid, free_gb, free_gb) + '\n')
+				freegb = %s
+				,totalgb = %s;"""
+		#doLog(logFile, sql  %  (uuid, free_gb, total_gb, free_gb, total_gb) + '\n')
 		try:
-			cursor.execute(sql, (uuid, free_gb, free_gb))
+			cursor.execute(sql, (uuid, free_gb, total_gb, free_gb, total_gb))
 		except MySQLdb.Error, e:
 			doLog(logFile,  "Error %d: %s" % (e.args[0], e.args[1]))
 
